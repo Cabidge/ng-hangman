@@ -18,6 +18,9 @@ import { State } from '../models/state.model';
 export class HangmanComponent implements OnInit {
   StateEnum = State;
   state = State.Active;
+
+  static readonly MAX_LIVES = 6;
+  lives = HangmanComponent.MAX_LIVES;
   word = '';
   guessedLetters = [] as string[];
   correctChars = [] as boolean[];
@@ -51,6 +54,7 @@ export class HangmanComponent implements OnInit {
 
   reset() {
     this.updateRandomWord();
+    this.lives = HangmanComponent.MAX_LIVES;
     this.guessedLetters = [];
     this.state = State.Active;
   }
@@ -59,6 +63,10 @@ export class HangmanComponent implements OnInit {
     return this.correctChars
       .map((correct, i) => (correct ? this.word[i] : '-'))
       .join('');
+  }
+
+  livesDisplay() {
+    return `${this.lives}/${HangmanComponent.MAX_LIVES}`;
   }
 
   onSubmit(e: Event) {
@@ -96,7 +104,9 @@ export class HangmanComponent implements OnInit {
     });
 
     if (!anyCorrect) {
-      alert('Incorrect guess');
+      if (--this.lives <= 0) {
+        this.lose();
+      }
     } else if (this.correctChars.every((correct) => correct)) {
       this.win();
     }

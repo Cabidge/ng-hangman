@@ -2,6 +2,7 @@
   <ng-container [ngSwitch]="state">
     <ng-template [ngSwitchCase]="StateEnum.Active">
       <p>Hint: {{ hint() }}</p>
+      <p>Lives: {{ livesDisplay() }}</p>
       <p>Guessed: {{ guessedLetters.toString() }}</p>
       <form (submit)="onSubmit($event)">
         <input type="text" [formControl]="guessControl" />
