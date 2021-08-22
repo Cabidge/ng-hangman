@@ -24,6 +24,9 @@ function charOrWordLengthValidator(word: string): ValidatorFn {
 })
 export class HangmanComponent implements OnInit {
   word = '';
+  guessedLetters = [] as string[];
+  remainingIndices = [] as number[];
+
   shownErrors = null as ValidationErrors | null;
   guessControl = new FormControl('', [Validators.pattern(/^[a-zA-Z]+$/)]);
 
@@ -37,6 +40,7 @@ export class HangmanComponent implements OnInit {
       .subscribe((data) => {
         const words = data.split(/\r?\n/);
         this.word = words[~~(Math.random() * words.length)];
+        this.remainingIndices = [...Array(this.word.length).keys()];
         this.guessControl.addValidators(charOrWordLengthValidator(this.word));
       });
   }
@@ -51,6 +55,7 @@ export class HangmanComponent implements OnInit {
     this.shownErrors = null;
 
     const guess = ((this.guessControl.value ?? '') as string).toLowerCase();
+
     if (guess.length === 1) {
       this.guessChar(guess);
     } else if (guess == this.word) {
@@ -61,6 +66,16 @@ export class HangmanComponent implements OnInit {
   }
 
   guessChar(chr: string) {
-    alert(`You guess the letter ${chr.toUpperCase()}`);
+    this.guessedLetters.push(chr);
+
+    const newRemaining = this.remainingIndices.filter(
+      (idx) => this.word[idx] != chr
+    );
+
+    if (newRemaining.length == this.remainingIndices.length) {
+      alert('Incorrect guess!');
+    }
+
+    this.remainingIndices = newRemaining;
   }
 }
