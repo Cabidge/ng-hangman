@@ -1,5 +1,6 @@
 <div *ngIf="word">
   <p>Word: {{ word }}</p>
+  <p>Hint: {{ hint() }}</p>
   <form (submit)="onSubmit($event)">
     <input type="text" [formControl]="guessControl" />
     <button>Guess</button>

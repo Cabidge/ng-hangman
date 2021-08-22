@@ -45,6 +45,12 @@ export class HangmanComponent implements OnInit {
       });
   }
 
+  hint() {
+    return this.correctChars
+      .map((correct, i) => (correct ? this.word[i] : '-'))
+      .join('');
+  }
+
   onSubmit(e: Event) {
     e.preventDefault();
 
