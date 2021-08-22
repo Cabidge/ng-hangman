@@ -40,9 +40,12 @@ export class HangmanComponent implements OnInit {
 
   updateRandomWord() {
     this.http
-      .get('http://localhost:4200/assets/words.txt', {
-        responseType: 'text',
-      })
+      .get(
+        'https://raw.githubusercontent.com/taikuukaits/SimpleWordlists/master/Wordlist-Nouns-Common-Audited-Len-3-6.txt',
+        {
+          responseType: 'text',
+        }
+      )
       .subscribe((data) => {
         const words = data.split(/\r?\n/);
         this.word = words[~~(Math.random() * words.length)];
