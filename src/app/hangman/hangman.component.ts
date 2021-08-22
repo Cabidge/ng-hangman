@@ -8,6 +8,8 @@ import {
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
+import { State } from '../models/state.model';
+
 function charOrWordLengthValidator(word: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const inputLength = control.value ? (control.value.length as number) : 0;
@@ -35,6 +37,8 @@ function alreadyGuessedValidator(guessedLetters: string[]): ValidatorFn {
   styleUrls: ['./hangman.component.css'],
 })
 export class HangmanComponent implements OnInit {
+  StateEnum = State;
+  state = State.Active;
   word = '';
   guessedLetters = [] as string[];
   correctChars = [] as boolean[];
@@ -81,7 +85,9 @@ export class HangmanComponent implements OnInit {
     if (guess.length === 1) {
       this.guessChar(guess);
     } else if (guess == this.word) {
-      alert('Correct guess');
+      this.win();
+    } else {
+      this.lose();
     }
 
     this.guessControl.reset();
@@ -101,6 +107,16 @@ export class HangmanComponent implements OnInit {
 
     if (!anyCorrect) {
       alert('Incorrect guess');
+    } else if (this.correctChars.every((correct) => correct)) {
+      this.win();
     }
+  }
+
+  win() {
+    this.state = State.Win;
+  }
+
+  lose() {
+    this.state = State.Loss;
   }
 }

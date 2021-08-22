@@ -1,18 +1,32 @@
 <div *ngIf="word">
-  <p>Hint: {{ hint() }}</p>
-  <p>Guessed: {{ guessedLetters.toString() }}</p>
-  <form (submit)="onSubmit($event)">
-    <input type="text" [formControl]="guessControl" />
-    <button>Guess</button>
+  <ng-container
+    *ngIf="state == StateEnum.Active; then active; else inactive"
+  ></ng-container>
+  <ng-template #inactive>
+    <ng-container
+      *ngIf="state == StateEnum.Win; then win; else lose"
+    ></ng-container>
+  </ng-template>
 
-    <ul *ngIf="shownErrors" class="warnings">
-      <li *ngIf="shownErrors?.alreadyGuessed">
-        Cannot guess the same guess twice
-      </li>
-      <li *ngIf="shownErrors?.pattern">Guess must only contain letters</li>
-      <li *ngIf="shownErrors?.invalidLength">
-        Guess must be only one letter or the full word
-      </li>
-    </ul>
-  </form>
+  <ng-template #active>
+    <p>Hint: {{ hint() }}</p>
+    <p>Guessed: {{ guessedLetters.toString() }}</p>
+    <form (submit)="onSubmit($event)">
+      <input type="text" [formControl]="guessControl" />
+      <button>Guess</button>
+
+      <ul *ngIf="shownErrors" class="warnings">
+        <li *ngIf="shownErrors?.alreadyGuessed">
+          Cannot guess the same guess twice
+        </li>
+        <li *ngIf="shownErrors?.pattern">Guess must only contain letters</li>
+        <li *ngIf="shownErrors?.invalidLength">
+          Guess must be only one letter or the full word
+        </li>
+      </ul>
+    </form>
+  </ng-template>
+
+  <ng-template #win>You Win! The word was: {{ word }}</ng-template>
+  <ng-template #lose>You Lose! The word was: {{ word }}</ng-template>
 </div>
