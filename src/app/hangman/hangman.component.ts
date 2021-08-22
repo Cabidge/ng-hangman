@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 function charOrWordLengthValidator(word: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const inputLength = control.value ? (control.value.length as number) : 0;
+
     return inputLength == 1 || inputLength == word.length
       ? null
       : { invalidLength: { value: control.value } };
@@ -19,7 +20,7 @@ function charOrWordLengthValidator(word: string): ValidatorFn {
 
 function alreadyGuessedValidator(guessedLetters: string[]): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    if (control.value.length != 1) return null;
+    if (!control.value || control.value.length != 1) return null;
 
     const guess = control.value.toLowerCase();
     return guessedLetters.includes(guess)
