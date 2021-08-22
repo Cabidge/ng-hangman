@@ -42,6 +42,7 @@ export class HangmanComponent implements OnInit {
         this.word = words[~~(Math.random() * words.length)];
         this.correctChars = Array(this.word.length).fill(false);
         this.guessControl.addValidators(charOrWordLengthValidator(this.word));
+        console.log(this.word);
       });
   }
 
