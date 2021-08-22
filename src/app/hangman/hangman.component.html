@@ -1,1 +1,7 @@
-<p *ngIf="word">{{ word }}</p>
+<div *ngIf="word">
+  <p>Word: {{ word }}</p>
+  <form (submit)="onSubmit($event)">
+    <input type="text" [formControl]="guessControl" />
+    <button>Guess</button>
+  </form>
+</div>
