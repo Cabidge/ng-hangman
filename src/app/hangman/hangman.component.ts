@@ -1,6 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+
+function charOrWordLengthValidator(word: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const inputLength = control.value ? (control.value.length as number) : 0;
+    return inputLength == 1 || inputLength == word.length
+      ? null
+      : { invalidLength: { value: control.value } };
+  };
+}
 
 @Component({
   selector: 'app-hangman',
@@ -8,8 +23,9 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./hangman.component.css'],
 })
 export class HangmanComponent implements OnInit {
-  word?: string;
-  guessControl = new FormControl('');
+  word = '';
+  shownErrors = null as ValidationErrors | null;
+  guessControl = new FormControl('', [Validators.pattern(/^[a-zA-Z]+$/)]);
 
   constructor(private http: HttpClient) {}
 
@@ -21,13 +37,20 @@ export class HangmanComponent implements OnInit {
       .subscribe((data) => {
         const words = data.split(/\r?\n/);
         this.word = words[~~(Math.random() * words.length)];
+        this.guessControl.addValidators(charOrWordLengthValidator(this.word));
       });
   }
 
   onSubmit(e: Event) {
     e.preventDefault();
 
-    const guess = (this.guessControl.value as string).toLowerCase();
+    if (this.guessControl.invalid) {
+      this.shownErrors = this.guessControl.errors;
+      return;
+    }
+    this.shownErrors = null;
+
+    const guess = ((this.guessControl.value ?? '') as string).toLowerCase();
     if (guess.length === 1) {
       this.guessChar(guess);
     } else if (guess == this.word) {
