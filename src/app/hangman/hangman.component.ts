@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-hangman',
@@ -6,7 +7,18 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./hangman.component.css'],
 })
 export class HangmanComponent implements OnInit {
-  constructor() {}
+  word?: string;
 
-  ngOnInit(): void {}
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.http
+      .get('http://localhost:4200/assets/words.txt', {
+        responseType: 'text',
+      })
+      .subscribe((data) => {
+        const words = data.split(/\r?\n/);
+        this.word = words[~~(Math.random() * words.length)];
+      });
+  }
 }
