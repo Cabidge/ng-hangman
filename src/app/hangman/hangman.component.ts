@@ -17,6 +17,17 @@ function charOrWordLengthValidator(word: string): ValidatorFn {
   };
 }
 
+function alreadyGuessedValidator(guessedLetters: string[]): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control.value.length != 1) return null;
+
+    const guess = control.value.toLowerCase();
+    return guessedLetters.includes(guess)
+      ? { alreadyGuessed: { value: control.value } }
+      : null;
+  };
+}
+
 @Component({
   selector: 'app-hangman',
   templateUrl: './hangman.component.html',
@@ -28,7 +39,10 @@ export class HangmanComponent implements OnInit {
   correctChars = [] as boolean[];
 
   shownErrors = null as ValidationErrors | null;
-  guessControl = new FormControl('', [Validators.pattern(/^[a-zA-Z]+$/)]);
+  guessControl = new FormControl('', [
+    Validators.pattern(/^[a-zA-Z]+$/),
+    alreadyGuessedValidator(this.guessedLetters),
+  ]);
 
   constructor(private http: HttpClient) {}
 
