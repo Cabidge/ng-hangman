@@ -10,27 +10,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { State } from '../models/state.model';
 
-function charOrWordLengthValidator(word: string): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const inputLength = control.value ? (control.value.length as number) : 0;
-
-    return inputLength == 1 || inputLength == word.length
-      ? null
-      : { invalidLength: { value: control.value } };
-  };
-}
-
-function alreadyGuessedValidator(guessedLetters: string[]): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    if (!control.value || control.value.length != 1) return null;
-
-    const guess = control.value.toLowerCase();
-    return guessedLetters.includes(guess)
-      ? { alreadyGuessed: { value: control.value } }
-      : null;
-  };
-}
-
 @Component({
   selector: 'app-hangman',
   templateUrl: './hangman.component.html',
@@ -46,12 +25,17 @@ export class HangmanComponent implements OnInit {
   shownErrors = null as ValidationErrors | null;
   guessControl = new FormControl('', [
     Validators.pattern(/^[a-zA-Z]+$/),
-    alreadyGuessedValidator(this.guessedLetters),
+    this.alreadyGuessedValidator(),
+    this.charOrWordLengthValidator(),
   ]);
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.updateRandomWord();
+  }
+
+  updateRandomWord() {
     this.http
       .get('http://localhost:4200/assets/words.txt', {
         responseType: 'text',
@@ -59,10 +43,16 @@ export class HangmanComponent implements OnInit {
       .subscribe((data) => {
         const words = data.split(/\r?\n/);
         this.word = words[~~(Math.random() * words.length)];
-        this.correctChars = Array(this.word.length).fill(false);
-        this.guessControl.addValidators(charOrWordLengthValidator(this.word));
         console.log(this.word);
+
+        this.correctChars = Array(this.word.length).fill(false);
       });
+  }
+
+  reset() {
+    this.updateRandomWord();
+    this.guessedLetters = [];
+    this.state = State.Active;
   }
 
   hint() {
@@ -118,5 +108,26 @@ export class HangmanComponent implements OnInit {
 
   lose() {
     this.state = State.Loss;
+  }
+
+  charOrWordLengthValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const inputLength = control.value ? (control.value.length as number) : 0;
+
+      return inputLength == 1 || inputLength == this.word.length
+        ? null
+        : { invalidLength: { value: control.value } };
+    };
+  }
+
+  alreadyGuessedValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value || control.value.length != 1) return null;
+
+      const guess = control.value.toLowerCase();
+      return this.guessedLetters.includes(guess)
+        ? { alreadyGuessed: { value: control.value } }
+        : null;
+    };
   }
 }

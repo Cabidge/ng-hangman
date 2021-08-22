@@ -26,4 +26,6 @@
       >You Lose! The word was: {{ word }}</ng-template
     >
   </ng-container>
+
+  <button *ngIf="state != StateEnum.Active" (click)="reset()">Restart</button>
 </div>
